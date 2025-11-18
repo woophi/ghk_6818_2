@@ -89,7 +89,7 @@ export const App = () => {
     sendDataToGA({
       engage_price: TICKET_PRICE * comboCounts,
     }).then(() => {
-      // LS.setItem(LSKeys.ShowThx, true);
+      LS.setItem(LSKeys.ShowThx, true);
       setThx(true);
       setLoading(false);
     });
