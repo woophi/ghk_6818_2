@@ -2,6 +2,7 @@ import { ButtonMobile } from '@alfalab/core-components/button/mobile';
 import { Gap } from '@alfalab/core-components/gap';
 import { SuperEllipse } from '@alfalab/core-components/icon-view/super-ellipse';
 import { PureCell } from '@alfalab/core-components/pure-cell';
+import { Spinner } from '@alfalab/core-components/spinner';
 import { Typography } from '@alfalab/core-components/typography';
 import { ArrowRightMIcon } from '@alfalab/icons-glyph/ArrowRightMIcon';
 import { TicketStarMIcon } from '@alfalab/icons-glyph/TicketStarMIcon';
@@ -25,6 +26,18 @@ const generateRandomNumbers = (count: number, min: number, max: number): number[
   }
 
   return randomNumbers;
+};
+
+const setRandomSelected = () => {
+  const selected: { row: number; col: number }[] = [];
+  while (selected.length < SELECT_NUMBERS_COUNT) {
+    const randRow = Math.floor(Math.random() * 6);
+    const randCol = Math.floor(Math.random() * 6);
+    if (!selected.some(si => si.row === randRow && si.col === randCol)) {
+      selected.push({ row: randRow, col: randCol });
+    }
+  }
+  return selected;
 };
 
 const get6Rows = () => [
@@ -53,7 +66,7 @@ export const App = () => {
   >([
     {
       comboNumbers: get6Rows(),
-      selectedComboIndexes: [],
+      selectedComboIndexes: setRandomSelected(),
     },
   ]);
 
@@ -109,41 +122,23 @@ export const App = () => {
                 })}
               >
                 <Typography.Text view="primary-medium">Комбинация {ticketIndex + 1}</Typography.Text>
-                {numbersData[ticketIndex] && !numbersData[ticketIndex].selectedComboIndexes.length ? (
-                  <Typography.Text view="primary-small" color="secondary">
-                    Выберите 5 чисел
-                  </Typography.Text>
-                ) : (
+                {numbersData[ticketIndex] && numbersData[ticketIndex].selectedComboIndexes.length ? null : (
                   <ButtonMobile
                     view="text"
                     className={appSt.comboBtn}
                     onClick={() => {
-                      if (numbersData[ticketIndex]?.selectedComboIndexes.length) {
-                        window.gtag('event', `and_jackpot_nov_erase_${ticketIndex + 1}_var2`);
-                        setNumbersData(
-                          numbersData.map((combo, comboIndex) => {
-                            if (comboIndex !== ticketIndex) return combo;
-
-                            return {
-                              ...combo,
-                              selectedComboIndexes: [],
-                            };
-                          }),
-                        );
-                      } else {
-                        window.gtag('event', 'and_jackpot_nov_choose_var2');
-                        setNumbersData(
-                          numbersData.concat([
-                            {
-                              comboNumbers: get6Rows(),
-                              selectedComboIndexes: [],
-                            },
-                          ]),
-                        );
-                      }
+                      window.gtag('event', 'and_jackpot_nov_choose_var2');
+                      setNumbersData(
+                        numbersData.concat([
+                          {
+                            comboNumbers: get6Rows(),
+                            selectedComboIndexes: setRandomSelected(),
+                          },
+                        ]),
+                      );
                     }}
                   >
-                    {numbersData[ticketIndex]?.selectedComboIndexes.length ? 'Стереть' : 'Выбрать'}
+                    Выбрать
                   </ButtonMobile>
                 )}
               </div>
@@ -175,34 +170,6 @@ export const App = () => {
                               si => si.row === rowIndex && si.col === colIndex,
                             ),
                           })}
-                          onClick={() => {
-                            setNumbersData(
-                              numbersData.map((combo, comboIndex) => {
-                                if (comboIndex !== ticketIndex) return combo;
-
-                                const isSelected = combo.selectedComboIndexes.some(
-                                  si => si.row === rowIndex && si.col === colIndex,
-                                );
-
-                                let newSelectedIndexes = combo.selectedComboIndexes.slice();
-
-                                if (isSelected) {
-                                  newSelectedIndexes = newSelectedIndexes.filter(
-                                    si => !(si.row === rowIndex && si.col === colIndex),
-                                  );
-                                } else {
-                                  if (newSelectedIndexes.length < SELECT_NUMBERS_COUNT) {
-                                    newSelectedIndexes.push({ row: rowIndex, col: colIndex });
-                                  }
-                                }
-
-                                return {
-                                  ...combo,
-                                  selectedComboIndexes: newSelectedIndexes,
-                                };
-                              }),
-                            );
-                          }}
                         >
                           {rowNumber}
                         </div>
@@ -222,18 +189,7 @@ export const App = () => {
 
                           return {
                             ...combo,
-                            // select 5 random numbers from comboNumbers
-                            selectedComboIndexes: (() => {
-                              const selected: { row: number; col: number }[] = [];
-                              while (selected.length < SELECT_NUMBERS_COUNT) {
-                                const randRow = Math.floor(Math.random() * 6);
-                                const randCol = Math.floor(Math.random() * 6);
-                                if (!selected.some(si => si.row === randRow && si.col === randCol)) {
-                                  selected.push({ row: randRow, col: randCol });
-                                }
-                              }
-                              return selected;
-                            })(),
+                            selectedComboIndexes: setRandomSelected(),
                           };
                         }),
                       );
@@ -260,7 +216,11 @@ export const App = () => {
                 </Typography.Text>
               </div>
               <SuperEllipse backgroundColor="#FFFFFF" size={48}>
-                <ArrowRightMIcon color="#212124" />
+                {loading ? (
+                  <Spinner style={{ margin: '0 auto', height: '24px' }} visible preset={24} />
+                ) : (
+                  <ArrowRightMIcon color="#212124" />
+                )}
               </SuperEllipse>
             </div>
           </div>
