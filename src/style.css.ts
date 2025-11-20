@@ -45,7 +45,7 @@ const img = style({
   objectFit: 'cover',
   marginBottom: '-16px',
   objectPosition: 'top',
-  marginTop: '8px',
+  marginTop: '-32px',
 });
 
 const textTitle = style({

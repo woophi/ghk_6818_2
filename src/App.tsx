@@ -195,7 +195,7 @@ export const App = () => {
                       );
                     }}
                   >
-                    Случайные числа
+                    Изменить комбинацию
                   </ButtonMobile>
                 </div>
               )}
@@ -240,7 +240,7 @@ export const App = () => {
             Выиграйте погашение кредита
           </Typography.Text>
 
-          <img src={bg} height={170} width="100%" className={appSt.img} />
+          <img src={bg} height={270} width="100%" className={appSt.img} />
         </div>
 
         <Typography.Text view="primary-medium">
